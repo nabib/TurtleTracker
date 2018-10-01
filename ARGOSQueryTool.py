@@ -12,10 +12,19 @@ fileName = "SaraNoHeader.txt"
 fileObj = open(fileName, 'r')
 
 # Read in all lines in the text file into a list variable
-lineString = fileObj.readline()
+lineStrings = fileObj.readlines()
+#lineStringsNoHeader = lineStrings[1:len(lineStrings)]
+print("There are {} records in the file".format(len(lineStrings)))
+      
+# Close the file
+fileObj.close()
+
+# Create empty dictionaries
+dateDict = {}
+locationDict = {}
 
 # Loop through the lines until all lines have been read
-while lineString:
+for lineString in lineStrings:
     # Use the split command to parse the items in lineString into a list object
     lineData = lineString.split("\t")
 
@@ -28,12 +37,34 @@ while lineString:
     obsLat = lineData[5]                # Observation Latitude
     obsLon = lineData[6]                # Observation Longitude
 
-    # Print information to the use
-    print ("Record {0} indicates Sara was seen at {1}N and {2}W on {3}".format(recordID, obsLat,obsLon,obsDate))
+    # Filter records that get added to the dictionary
+    if obsLC in ("1","2","3"):
+        # Add values to dictionary
+        dateDict[recordID] = obsDate
+        locationDict[recordID] = (obsLon,obsLat)
 
-    # Move to the next line
-    lineString = fileObj.readline()
+# Ask user for date, specifying the format
+userDate = input("Enter a date (M/D/YYYY):")
 
-# Close the file
-fileObj.close()
+# Create empty key list
+keyList = []
+
+# Loop through all key, value pairs in the dateDictionary
+for k, v in dateDict.items():
+    # See if date matches the user date
+    if v == userDate:
+        keyList.append(k)
+
+# Check that at least one key was returned
+if len(keyList) == 0:
+    print("No observations returned for {}".format(userDate))
+else:
+    # Loop through each key and report the date's associated location
+    for k in keyList:
+        theDate = dateDict[k]
+        theLocation = locationDict[k]
+        theLat = theLocation[1]
+        theLon = theLocation[0]
+        print("Record {0}: Sara was seen at {1}N,{2}W, on {3}".format(k,theLat,theLon,theDate))
+
 
